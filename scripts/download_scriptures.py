@@ -1,4 +1,5 @@
 import pathlib
+import shutil
 
 import requests
 from bs4 import BeautifulSoup
@@ -71,9 +72,54 @@ def download_books():
                         fout.write(r.content)
 
 
+def download_chapters():
+    for volume in VOLUMES:
+        print(volume)
+        path = pathlib.Path(volume)
+        books = path / 'books'
+        for book in books.iterdir():
+            data = None
+            soup = None
+            chapters = []
+            book_slug = book.stem
+            print(book_slug)
+            folder = path / 'chapters' / book_slug
+            folder.mkdir(parents=True, exist_ok=True)
+            with open(book, encoding='utf8') as fin:
+                data = fin.read()
+                soup = BeautifulSoup(data, 'html.parser')
+            primary = soup.find(id='primary')
+            chapters_ul = primary.find_all('ul', class_='jump-to-chapter')
+            if chapters_ul:
+                for ul in chapters_ul:
+                    links = ul.find_all('a')
+                    for link in links:
+                        label = link.text
+                        print(label)
+                        url = link['href']
+                        r = requests.get(url)
+                        filepath = folder / '{}.html'.format(label)
+                        with open(filepath, 'wb') as fout:
+                            fout.write(r.content)
+            else:
+                shutil.copy(book, folder)
+            
+
+def create_json():
+    # what data do we need?
+    for volume in VOLUMES:
+        path = pathlib.Path(volume)
+        chapters = path / 'chapters'
+        frontmatter = path / 'frontmatter'
+        print(path)
+        print(frontmatter)
+
+
 def main():
-    download_volumes()
-    download_books()
+    # download_volumes()
+    # download_books()
+    # download_chapters()
+    create_json()
 
 
 if __name__ == '__main__':
