@@ -1,5 +1,11 @@
 import json
 
+if len(sys.argv) != 2:
+    print("Usage: python scripture_search.py book-of-mormon-flat.json")
+    sys.exit(-1)
+
+filename = sys.argv[1]
+
 search_query = str(input('Enter a search query: '))
 
 print('Searching for {}...'.format(search_query))
@@ -8,7 +14,7 @@ results = []
 
 data = None
 
-with open('book-of-mormon-flat.json', encoding='utf8') as fin:
+with open(filename, encoding='utf8') as fin:
     data = json.load(fin)
 
 verses = data['verses']
