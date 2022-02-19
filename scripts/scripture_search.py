@@ -1,4 +1,5 @@
 import json
+import sys
 
 if len(sys.argv) != 2:
     print("Usage: python scripture_search.py book-of-mormon-flat.json")
@@ -26,10 +27,15 @@ for verse in verses:
 print('Finished searching.')
 
 filename = 'search-result_{}.txt'.format(search_query)
+
 heading = '# {}\n\n'
 
 with open(filename, 'w', encoding='utf8') as fout:
     fout.write(heading.format(search_query))
+    fout.write('## References\n\n')
+    for result in results:
+        fout.write('- ' + result.get('reference') + '\n')
+    fout.write('\n## Scriptures\n\n')
     for result in results:
         fout.write(result.get('reference') + '\n\n')
         fout.write(result.get('text') + '\n\n')
